@@ -1,0 +1,34 @@
+imports:
+- path: instancetemplate.jinja
+
+resources:
+ - name: instance-template-1
+   type: instancetemplate.jinja
+   properties:
+    name: instance-template-1
+ - name: instance-group
+   type: compute.v1.instanceGroupManagers
+   properties:
+     baseInstanceName: instance
+     instanceTemplate: $(ref.instance-template-1.selfLink)
+     targetSize: 2
+     zone: northamerica-northeast1-a
+ - name: autoscaler
+   type: compute.v1.autoscaler
+   properties:
+     zone: northamerica-northeast1-a
+     target: $(ref.instance-group.selfLink)
+     autoscalingPolicy:
+       minNumReplicas: 2
+       maxNumReplicas: 5
+       coolDownPeriodSec: 30
+       cpuUtilization:
+        utilizationTarget: 0.8
+ - name: a-firewall-rule
+   type: compute.v1.firewall
+   properties:
+     sourceRanges: ["0.0.0.0/0"]
+     targetTags: ["myrules"]
+     allowed:
+     - IPProtocol: TCP
+       ports: ["80"]

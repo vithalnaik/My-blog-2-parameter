@@ -1,0 +1,52 @@
+resources:
+ - name: {{ properties["name"] }}
+   type: compute.v1.instanceTemplate
+   properties:
+    properties:
+     machineType: f1-micro
+     tags:
+       items:
+       - http-server
+       - http-tag
+     metadata:
+       kind: compute#metadata
+       items:
+       - key: startup-script
+         value: |
+                #!/bin/bash
+                sudo apt update -y
+                sudo apt install apache2 -y
+                sudo apt install git -y
+                rm -rf /var/www/html/*
+                cd /var/www/html
+                git clone https://github.com/vithalnaik/myblog.git . 
+                sed -i "s/hostname/`hostname`/g" index.html
+     disks:
+     - type: PERSISTENT
+       boot: true
+       mode: READ_WRITE
+       autoDelete: true
+       deviceName: instance-template-1
+       initializeParams:
+         sourceImage: projects/ubuntu-os-cloud/global/images/ubuntu-1804-bionic-v20181222
+         diskType: pd-standard
+         diskSizeGb: '10'
+     networkInterfaces:
+     - network: projects/{{ env["project"] }}/global/networks/default
+       accessConfigs:
+       - name: External NAT
+         type: ONE_TO_ONE_NAT
+         networkTier: PREMIUM
+     scheduling:
+       preemptible: false
+       onHostMaintenance: MIGRATE
+       automaticRestart: true
+     serviceAccounts:
+     - email: 416709458889-compute@developer.gserviceaccount.com
+       scopes:
+       - https://www.googleapis.com/auth/devstorage.read_only
+       - https://www.googleapis.com/auth/logging.write
+       - https://www.googleapis.com/auth/monitoring.write
+       - https://www.googleapis.com/auth/servicecontrol
+       - https://www.googleapis.com/auth/service.management.readonly
+       - https://www.googleapis.com/auth/trace.append
