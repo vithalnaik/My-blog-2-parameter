@@ -11,7 +11,7 @@ resources:
    properties:
      baseInstanceName: instance
      instanceTemplate: $(ref.instance-template-1.selfLink)
-     targetSize: 2
+     targetSize: 1
      zone: northamerica-northeast1-a
  - name: autoscaler
    type: compute.v1.autoscaler
@@ -19,7 +19,7 @@ resources:
      zone: northamerica-northeast1-a
      target: $(ref.instance-group.selfLink)
      autoscalingPolicy:
-       minNumReplicas: 2
+       minNumReplicas: 1
        maxNumReplicas: 5
        coolDownPeriodSec: 30
        cpuUtilization:
